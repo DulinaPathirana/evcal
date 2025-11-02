@@ -1,25 +1,25 @@
 <!DOCTYPE html>
-<html lang="en">
+
+
   <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Leslie Matrix Eigenvalue Calculator | Dominant Eigenvalue and Eigenvector Online</title>
-  <meta name="description" content="Free online Leslie matrix eigenvalue calculator. Compute dominant eigenvalue (lambda) and eigenvector for population models with power iteration. No installs, instant results."/>
-  <meta name="keywords" content="Leslie matrix,eigenvalue calculator,eigenvector,population model,dominant eigenvalue,power iteration,age-structured matrix,linear algebra,demography,life table,projection matrix"/>
-  <meta name="author" content="Dulina Pathirana"/>
-  <meta name="google-site-verification" content="JPSGESOn6ejBKEXOWFcdbXAmti1vWEg5h2YJHIlWn-U"/>
-  <link rel="canonical" href="https://dulinaPathirana.github.io/evcal/"/>
-  <link rel="sitemap" type="application/xml" href="/sitemap.xml"/>
-  <meta property="og:type" content="website"/>
-  <meta property="og:title" content="Leslie Matrix Eigenvalue Calculator"/>
-  <meta property="og:description" content="Compute dominant eigenvalue and eigenvector for Leslie population matrices online."/>
-  <meta property="og:url" content="https://dulinaPathirana.github.io/evcal/"/>
-  <meta property="og:site_name" content="evcal"/>
-  <meta name="twitter:card" content="summary"/>
-  <meta name="twitter:title" content="Leslie Matrix Eigenvalue Calculator"/>
-  <meta name="twitter:description" content="Free online tool for dominant eigenvalue and eigenvector of Leslie matrices."/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  Leslie Matrix Eigenvalue Calculator | Dominant Eigenvalue and Eigenvector Online
+  <meta content="Free online Leslie matrix eigenvalue calculator. Compute dominant eigenvalue (lambda) and eigenvector for population models with power iteration. No installs, instant results." name="description"/>
+  <meta content="Leslie matrix,eigenvalue calculator,eigenvector,population model,dominant eigenvalue,power iteration,age-structured matrix,linear algebra,demography,life table,projection matrix" name="keywords"/>
+  <meta content="Dulina Pathirana" name="author"/>
+  <meta content="JPSGESOn6ejBKEXOWFcdbXAmti1vWEg5h2YJHIlWn-U" name="google-site-verification"/>
+  <link href="https://dulinaPathirana.github.io/evcal/" rel="canonical"/>
+  <link href="/sitemap.xml" rel="sitemap" type="application/xml"/>
+  <meta content="website" property="og:type"/>
+  <meta content="Leslie Matrix Eigenvalue Calculator" property="og:title"/>
+  <meta content="Compute dominant eigenvalue and eigenvector for Leslie population matrices online." property="og:description"/>
+  <meta content="https://dulinaPathirana.github.io/evcal/" property="og:url"/>
+  <meta content="evcal" property="og:site_name"/>
+  <meta content="summary" name="twitter:card"/>
+  <meta content="Leslie Matrix Eigenvalue Calculator" name="twitter:title"/>
+  <meta content="Free online tool for dominant eigenvalue and eigenvector of Leslie matrices." name="twitter:description"/>
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"Leslie Matrix Eigenvalue Calculator","applicationCategory":"EducationalApplication","operatingSystem":"Any","url":"https://dulinaPathirana.github.io/evcal/","description":"Compute the dominant eigenvalue (growth rate) and eigenvector (stable age distribution) of a Leslie population matrix using the power iteration method.","creator":{"@type":"Person","name":"Dulina Pathirana","url":"https://github.com/DulinaPathirana"},"about":[{"@type":"Thing","name":"Leslie matrix"},{"@type":"Thing","name":"Eigenvalue"},{"@type":"Thing","name":"Eigenvector"},{"@type":"Thing","name":"Population model"}]}</script>
-  <style>
-    *{box-sizing:border-box;margin:0;padding:0}
+  <br>    *{box-sizing:border-box;margin:0;padding:0}
     body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;background:linear-gradient(135deg,#f8f9fa 0%,#e9ecef 100%);color:#2c3e50;line-height:1.7;padding:40px 20px;min-height:100vh;display:flex;flex-direction:column}
     .container{max-width:1400px;margin:0 auto;background:#fff;border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,.08);padding:50px;flex:1}
     header{text-align:center;margin-bottom:50px;padding-bottom:30px;border-bottom:2px solid #e8eef3}
@@ -53,10 +53,9 @@
     footer a{color:#667eea;text-decoration:none;font-weight:500;transition:color .3s ease}
     footer a:hover{color:#764ba2;text-decoration:underline}
     .hidden{display:none}
-  </style>
-  <div class="container">
+  <br>  <div class="container">
     <header>
-      <h1>Leslie Matrix Eigenvalue Calculator</h1>
+      Leslie Matrix Eigenvalue Calculator
       <p class="subtitle">Calculate the dominant eigenvalue of a 21×21 Leslie matrix</p>
     </header>
     <div class="controls">
@@ -69,41 +68,40 @@
       </div>
       <div class="control-group">
         <label for="p0">Initial Population (P₀)</label>
-        <input id="p0" type="number" step="any" min="0" placeholder="Enter initial population"/>
+        <input id="p0" min="0" placeholder="Enter initial population" step="any" type="number"/>
       </div>
     </div>
     <div class="matrix-section">
       <div class="matrix-header">Leslie Matrix (21×21)</div>
-      <div id="matrixGrid" class="matrix-grid"></div>
+      <div class="matrix-grid" id="matrixGrid"></div>
     </div>
-    <div id="results" class="results hidden">
-      <h2>Results</h2>
+    <div class="results hidden" id="results">
+      Results
       <div class="result-item">
         <span class="result-label">Dominant Eigenvalue (λ₁):</span>
-        <span id="eigenvalue" class="result-value">—</span>
+        <span class="result-value" id="eigenvalue">—</span>
       </div>
       <div class="result-item">
         <span class="result-label">Iterations:</span>
-        <span id="iterations" class="result-value">—</span>
+        <span class="result-value" id="iterations">—</span>
       </div>
       <div class="result-item">
         <span class="result-label">Dominant Eigenvector:</span>
-        <div id="eigenvector" class="eigenvector"></div>
+        <div class="eigenvector" id="eigenvector"></div>
       </div>
-      <div id="projection" class="projection hidden">
+      <div class="projection hidden" id="projection">
         <div class="formula">P(t) = P₀ · g^t, where g = λ₁^(1/5)</div>
         <table>
-          <thead><tr><th>Year</th><th>P(t)</th></tr></thead>
+          YearP(t)
           <tbody id="projectionBody"></tbody>
         </table>
       </div>
     </div>
     <footer>
-      Designed and developed by <a href="https://github.com/DulinaPathirana" target="_blank" rel="noopener">Dulina Pathirana</a>
+      Designed and developed by <a href="https://github.com/DulinaPathirana" rel="noopener" target="_blank">Dulina Pathirana</a>
     </footer>
   </div>
-  <script>
-    const SIZE = 21;
+  <br>    const SIZE = 21;
     const grid = document.getElementById('matrixGrid');
     function buildGrid(){
       grid.innerHTML='';
@@ -122,17 +120,17 @@
       }
     }
     buildGrid();
-
-    // Robust CSV import: supports \r\n or \n, trims cells, handles non-numeric as 0, and enforces 21x21
+    // Robust CSV import and ensure values appear in grid immediately
     document.getElementById('csvFile').addEventListener('change', (e)=>{
       const file=e.target.files[0];
       if(!file) return;
       const reader=new FileReader();
       reader.onload=()=>{
         const text = String(reader.result || '');
-        // Normalize newlines, remove trailing blank lines
         const rawRows = text.replace(/\r\n?/g, '\n').split('\n');
         const rows = rawRows.filter((row, idx) => row.trim().length>0 || idx < SIZE);
+        // Ensure grid exists before filling
+        if (!grid.children.length) buildGrid();
         for(let r=0; r<SIZE; r++){
           const line = (rows[r] ?? '').trim();
           const cols = line.length ? line.split(',') : [];
@@ -140,7 +138,6 @@
             const idx = r*SIZE + c;
             const cell = grid.children[idx];
             let v = (cols[c] ?? '').trim();
-            // Default to 0 if non-numeric or empty
             const num = parseFloat(v.replace(/\u00A0/g, ''));
             cell.value = Number.isFinite(num) ? String(num) : '0';
           }
@@ -148,7 +145,6 @@
       };
       reader.readAsText(file);
     });
-
     function readMatrix(){
       const A = Array.from({length: SIZE}, ()=>Array(SIZE).fill(0));
       for(let r=0;r<SIZE;r++){
@@ -181,7 +177,7 @@
       document.getElementById('eigenvector').textContent=formatVector(v);
       updateProjection();
     }
-    const years=[2025,2030,2035,2040,2045,2050];
+    const years=[2015,2020,2025,2030,2035,2040,2045,2050];
     function updateProjection(){
       const evSpan=document.getElementById('eigenvalue');
       const proj=document.getElementById('projection');
@@ -206,5 +202,4 @@
       proj.classList.remove('hidden');
     }
     document.getElementById('p0').addEventListener('input',updateProjection);
-  </script>
-</html>
+  

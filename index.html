@@ -1,215 +1,88 @@
 <!DOCTYPE html>
-
-  <meta charset="utf-8"/>
-  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-  Leslie Matrix Eigenvalue Calculator | Dominant Eigenvalue and Eigenvector Online
-  <meta content="Free online Leslie matrix eigenvalue calculator. Compute dominant eigenvalue (lambda) and eigenvector for population models with power iteration. No installs, instant results." name="description"/>
-  <meta content="Leslie matrix,eigenvalue calculator,eigenvector,population model,dominant eigenvalue,power iteration,age-structured matrix,linear algebra,demography,life table,projection matrix" name="keywords"/>
-  <meta content="Dulina Pathirana" name="author"/>
-  <meta content="JPSGESOn6ejBKEXOWFcdbXAmti1vWEg5h2YJHIlWn-U" name="google-site-verification"/>
-  <link href="https://dulinaPathirana.github.io/evcal/" rel="canonical"/>
-  <link href="/sitemap.xml" rel="sitemap" type="application/xml"/>
-  <!-- Open Graph -->
-  <meta content="website" property="og:type"/>
-  <meta content="Leslie Matrix Eigenvalue Calculator" property="og:title"/>
-  <meta content="Compute dominant eigenvalue and eigenvector for Leslie population matrices online." property="og:description"/>
-  <meta content="https://dulinaPathirana.github.io/evcal/" property="og:url"/>
-  <meta content="evcal" property="og:site_name"/>
-  <!-- Twitter Card -->
-  <meta content="summary" name="twitter:card"/>
-  <meta content="Leslie Matrix Eigenvalue Calculator" name="twitter:title"/>
-  <meta content="Free online tool for dominant eigenvalue and eigenvector of Leslie matrices." name="twitter:description"/>
-  <!-- Structured Data -->
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "WebApplication",
-    "name": "Leslie Matrix Eigenvalue Calculator",
-    "applicationCategory": "EducationalApplication",
-    "operatingSystem": "Any",
-    "url": "https://dulinaPathirana.github.io/evcal/",
-    "description": "Compute the dominant eigenvalue (growth rate) and eigenvector (stable age distribution) of a Leslie population matrix using the power iteration method.",
-    "creator": {"@type": "Person", "name": "Dulina Pathirana", "url": "https://github.com/DulinaPathirana"},
-    "about": [
-      {"@type": "Thing", "name": "Leslie matrix"},
-      {"@type": "Thing", "name": "Eigenvalue"},
-      {"@type": "Thing", "name": "Eigenvector"},
-      {"@type": "Thing", "name": "Population model"}
-    ]
-  }
-  </script>
-  <meta charset="utf-8"/>
-  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-  Leslie Matrix Eigenvalue Calculator
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); color: #2c3e50; line-height: 1.7; padding: 40px 20px; min-height: 100vh; display: flex; flex-direction: column; }
-    .container { max-width: 1400px; margin: 0 auto; background: #ffffff; border-radius: 16px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08); padding: 50px; flex: 1; }
-    header { text-align: center; margin-bottom: 50px; padding-bottom: 30px; border-bottom: 2px solid #e8eef3; }
-    h1 { font-size: 32px; font-weight: 600; color: #34495e; margin-bottom: 12px; letter-spacing: -0.5px; }
-    .subtitle { font-size: 15px; color: #7f8c8d; font-weight: 400; }
-    .controls { display: flex; gap: 24px; margin-bottom: 40px; align-items: flex-end; flex-wrap: wrap; }
-    .control-group { flex: 1; min-width: 220px; }
-    label { display: block; font-size: 14px; font-weight: 500; color: #5a6c7d; margin-bottom: 8px; }
-    input[type="file"], input[type="number"] { width: 100%; padding: 12px 16px; border: 2px solid #e1e8ed; border-radius: 10px; font-size: 14px; background: #f8fafb; transition: all 0.3s ease; }
-    input[type="file"]:hover, input[type="number"]:hover { border-color: #b8c5d0; background: #ffffff; }
-    button { padding: 13px 32px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; border: none; border-radius: 10px; font-size: 15px; font-weight: 500; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.25); }
-    button:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(102, 126, 234, 0.35); }
-    button:active { transform: translateY(0); }
-    .matrix-section { margin-bottom: 40px; }
-    .matrix-header { font-size: 18px; font-weight: 600; color: #34495e; margin-bottom: 20px; }
-    .matrix-grid { display: grid; grid-template-columns: repeat(21, 1fr); gap: 3px; background: #e8eef3; padding: 3px; border-radius: 10px; overflow-x: auto; }
-    .matrix-cell { width: 100%; min-width: 48px; padding: 8px 6px; border: none; background: #ffffff; text-align: center; font-size: 12px; font-family: 'Courier New', monospace; border-radius: 4px; transition: all 0.2s ease; }
-    .matrix-cell:focus { outline: none; box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.3); background: #f8fafb; z-index: 1; }
-    .results { margin-top: 40px; padding: 30px; background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%); border-radius: 12px; border: 2px solid #e8eef3; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05); }
-    .results h2 { font-size: 20px; font-weight: 600; color: #34495e; margin-bottom: 20px; }
-    .result-item { margin-bottom: 16px; font-size: 15px; }
-    .result-label { font-weight: 500; color: #5a6c7d; }
-    .result-value { font-family: 'Courier New', monospace; color: #2c3e50; font-size: 16px; margin-left: 10px; }
-    .eigenvector { margin-top: 20px; padding: 20px; background: #ffffff; border-radius: 8px; font-family: 'Courier New', monospace; font-size: 13px; max-height: 240px; overflow-y: auto; border: 1px solid #e8eef3; }
-    .projection { margin-top: 24px; }
-    .formula { font-size: 14px; color: #5a6c7d; margin-bottom: 10px; }
-    table { width: 100%; border-collapse: collapse; }
-    th, td { padding: 10px; border-bottom: 1px solid #e8eef3; text-align: right; font-family: 'Courier New', monospace; }
-    th { text-align: left; color: #5a6c7d; font-weight: 600; }
-    footer { margin-top: 50px; padding-top: 30px; border-top: 2px solid #e8eef3; text-align: center; font-size: 14px; color: #7f8c8d; }
-    footer a { color: #667eea; text-decoration: none; font-weight: 500; transition: color 0.3s ease; }
-    footer a:hover { color: #764ba2; text-decoration: underline; }
-    .hidden { display: none; }
-  </style>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Leslie Matrix Eigenvalue Calculator | Dominant Eigenvalue and Eigenvector Online</title>
+  <meta name="description" content="Free online Leslie matrix eigenvalue calculator. Compute dominant eigenvalue (lambda) and eigenvector for population models with power iteration. No installs, instant results." />
+  <meta name="keywords" content="Leslie matrix,eigenvalue calculator,eigenvector,population model,dominant eigenvalue,power iteration,age-structured matrix,linear algebra,demography,life table,projection matrix" />
+  <meta name="author" content="Dulina Pathirana" />
+  <meta name="google-site-verification" content="JPSGESOn6ejBKEXOWFcdbXAmti1vWEg5h2YJHIlWn-U" />
+  <link rel="canonical" href="https://dulinaPathirana.github.io/evcal/" />
+  <link rel="sitemap" type="application/xml" href="/sitemap.xml" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Leslie Matrix Eigenvalue Calculator" />
+  <meta property="og:description" content="Compute dominant eigenvalue and eigenvector for Leslie population matrices online." />
+  <meta property="og:url" content="https://dulinaPathirana.github.io/evcal/" />
+  <meta property="og:site_name" content="evcal" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Leslie Matrix Eigenvalue Calculator" />
+  <meta name="twitter:description" content="Free online tool for dominant eigenvalue and eigenvector of Leslie matrices." />
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"Leslie Matrix Eigenvalue Calculator","applicationCategory":"EducationalApplication","operatingSystem":"Any","url":"https://dulinaPathirana.github.io/evcal/","description":"Compute the dominant eigenvalue (growth rate) and eigenvector (stable age distribution) of a Leslie population matrix using the power iteration method.","creator":{"@type":"Person","name":"Dulina Pathirana","url":"https://github.com/DulinaPathirana"},"about":[{"@type":"Thing","name":"Leslie matrix"},{"@type":"Thing","name":"Eigenvalue"},{"@type":"Thing","name":"Eigenvector"},{"@type":"Thing","name":"Population model"}]}</script>
+  <style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;background:linear-gradient(135deg,#f8f9fa 0%,#e9ecef 100%);color:#2c3e50;line-height:1.7;padding:40px 20px;min-height:100vh;display:flex;flex-direction:column}.container{max-width:1400px;margin:0 auto;background:#fff;border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,.08);padding:50px;flex:1}header{text-align:center;margin-bottom:50px;padding-bottom:30px;border-bottom:2px solid #e8eef3}h1{font-size:32px;font-weight:600;color:#34495e;margin-bottom:12px;letter-spacing:-.5px}.subtitle{font-size:15px;color:#7f8c8d;font-weight:400}.controls{display:flex;gap:24px;margin-bottom:40px;align-items:flex-end;flex-wrap:wrap}.control-group{flex:1;min-width:220px}label{display:block;font-size:14px;font-weight:500;color:#5a6c7d;margin-bottom:8px}input[type=file],input[type=number]{width:100%;padding:12px 16px;border:2px solid #e1e8ed;border-radius:10px;font-size:14px;background:#f8fafb;transition:all .3s ease}input[type=file]:hover,input[type=number]:hover{border-color:#b8c5d0;background:#fff}button{padding:13px 32px;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:500;cursor:pointer;transition:all .3s ease;box-shadow:0 4px 15px rgba(102,126,234,.25)}button:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(102,126,234,.35)}button:active{transform:translateY(0)}.matrix-section{margin-bottom:40px}.matrix-header{font-size:18px;font-weight:600;color:#34495e;margin-bottom:20px}.matrix-grid{display:grid;grid-template-columns:repeat(21,1fr);gap:3px;background:#e8eef3;padding:3px;border-radius:10px;overflow-x:auto}.matrix-cell{width:100%;min-width:48px;padding:8px 6px;border:none;background:#fff;text-align:center;font-size:12px;font-family:'Courier New',monospace;border-radius:4px;transition:all .2s ease}.matrix-cell:focus{outline:none;box-shadow:0 0 0 3px rgba(102,126,234,.3);background:#f8fafb;z-index:1}.results{margin-top:40px;padding:30px;background:linear-gradient(135deg,#f8f9fa 0%,#fff 100%);border-radius:12px;border:2px solid #e8eef3;box-shadow:0 4px 20px rgba(0,0,0,.05)}.results h2{font-size:20px;font-weight:600;color:#34495e;margin-bottom:20px}.result-item{margin-bottom:16px;font-size:15px}.result-label{font-weight:500;color:#5a6c7d}.result-value{font-family:'Courier New',monospace;color:#2c3e50;font-size:16px;margin-left:10px}.eigenvector{margin-top:20px;padding:20px;background:#fff;border-radius:8px;font-family:'Courier New',monospace;font-size:13px;max-height:240px;overflow-y:auto;border:1px solid #e8eef3}.projection{margin-top:24px}.formula{font-size:14px;color:#5a6c7d;margin-bottom:10px}table{width:100%;border-collapse:collapse}th,td{padding:10px;border-bottom:1px solid #e8eef3;text-align:right;font-family:'Courier New',monospace}th{text-align:left;color:#5a6c7d;font-weight:600}footer{margin-top:50px;padding-top:30px;border-top:2px solid #e8eef3;text-align:center;font-size:14px;color:#7f8c8d}footer a{color:#667eea;text-decoration:none;font-weight:500;transition:color .3s ease}footer a:hover{color:#764ba2;text-decoration:underline}.hidden{display:none}</style>
+</head>
+<body>
   <div class="container">
     <header>
-      Leslie Matrix Eigenvalue Calculator
+      <h1>Leslie Matrix Eigenvalue Calculator</h1>
       <p class="subtitle">Calculate the dominant eigenvalue of a 21×21 Leslie matrix</p>
     </header>
     <div class="controls">
       <div class="control-group">
         <label for="csvFile">Upload Matrix (CSV)</label>
-        <input accept=".csv" id="csvFile" type="file"/>
+        <input id="csvFile" type="file" accept=".csv" />
       </div>
       <div class="control-group">
-        <button onclick="calculateEigenvalue()">Calculate Dominant Eigenvalue</button>
+        <button onclick="calculateEigenvalue()">Calculate</button>
       </div>
-      <!-- New P0 input (additive, does not change existing controls) -->
       <div class="control-group">
         <label for="p0">Initial Population (P₀)</label>
-        <input id="p0" type="number" min="0" step="any" placeholder="Enter initial population"/>
+        <input id="p0" type="number" step="any" min="0" placeholder="Enter initial population" />
       </div>
     </div>
     <div class="matrix-section">
       <div class="matrix-header">Leslie Matrix (21×21)</div>
-      <div class="matrix-grid" id="matrixGrid"></div>
+      <div id="matrixGrid" class="matrix-grid"></div>
     </div>
-    <div class="results hidden" id="results">
-      Results
+    <div id="results" class="results hidden">
+      <h2>Results</h2>
       <div class="result-item">
         <span class="result-label">Dominant Eigenvalue (λ₁):</span>
-        <span class="result-value" id="eigenvalue">—</span>
+        <span id="eigenvalue" class="result-value">—</span>
       </div>
       <div class="result-item">
         <span class="result-label">Iterations:</span>
-        <span class="result-value" id="iterations">—</span>
+        <span id="iterations" class="result-value">—</span>
       </div>
       <div class="result-item">
         <span class="result-label">Dominant Eigenvector:</span>
-        <div class="eigenvector" id="eigenvector"></div>
+        <div id="eigenvector" class="eigenvector"></div>
       </div>
-      <!-- New projection section (additive only) -->
-      <div class="projection hidden" id="projection">
+      <div id="projection" class="projection hidden">
         <div class="formula">P(t) = P₀ · g^t, where g = λ₁^(1/5)</div>
         <table>
-          <thead>
-            <tr><th>Year</th><th>P(t)</th></tr>
-          </thead>
+          <thead><tr><th>Year</th><th>P(t)</th></tr></thead>
           <tbody id="projectionBody"></tbody>
         </table>
       </div>
     </div>
     <footer>
-      Designed and developed by <a href="https://github.com/DulinaPathirana" rel="noopener" target="_blank">Dulina Pathirana</a>
+      Designed and developed by <a href="https://github.com/DulinaPathirana" target="_blank" rel="noopener">Dulina Pathirana</a>
     </footer>
   </div>
   <script>
-    // The following script additions are appended and do not modify existing functions
-    (function(){
-      // Hook after calculation by observing eigenvalue field update
-      const evSpan = document.getElementById('eigenvalue');
-      const results = document.getElementById('results');
-      const proj = document.getElementById('projection');
-      const projBody = document.getElementById('projectionBody');
-      const p0Input = document.getElementById('p0');
-
-      const years = [2025, 2030, 2035, 2040, 2045, 2050];
-
-      // Mutation observer to detect when eigenvalue text changes
-      const observer = new MutationObserver(() => {
-        // Ensure results are visible
-        if (!results || results.classList.contains('hidden')) return;
-        const text = evSpan && evSpan.textContent ? evSpan.textContent.trim() : '';
-        const lam = parseFloat(text);
-        if (!isFinite(lam) || lam <= 0) return;
-        // Compute g as the 5th root of lambda
-        const g = Math.pow(lam, 1/5);
-        // Build formula text explicitly in case we need to refresh
-        const formulaDiv = proj.querySelector('.formula');
-        if (formulaDiv) {
-          formulaDiv.textContent = 'P(t) = P₀ · g^t, where g = λ₁^(1/5)';
-        }
-        // Read P0
-        const P0 = parseFloat(p0Input && p0Input.value ? p0Input.value : '');
-        if (!isFinite(P0) || P0 < 0) {
-          // If P0 not entered, keep section hidden until user provides it
-          proj.classList.add('hidden');
-          return;
-        }
-        // Populate table
-        projBody.innerHTML = '';
-        years.forEach((year, idx) => {
-          const t = idx; // 5-year steps starting at 2025 as t=0
-          const pt = P0 * Math.pow(g, t);
-          const tr = document.createElement('tr');
-          const tdYear = document.createElement('td');
-          tdYear.textContent = String(year);
-          tdYear.style.textAlign = 'left';
-          const tdVal = document.createElement('td');
-          tdVal.textContent = Number(pt).toLocaleString(undefined, { maximumFractionDigits: 6 });
-          tr.appendChild(tdYear);
-          tr.appendChild(tdVal);
-          projBody.appendChild(tr);
-        });
-        proj.classList.remove('hidden');
-      });
-
-      if (evSpan) {
-        observer.observe(evSpan, { characterData: true, subtree: true, childList: true });
-      }
-
-      // Also recompute when P0 changes after eigenvalue already computed
-      if (p0Input) {
-        p0Input.addEventListener('input', () => {
-          // Trigger observer logic by dispatching a change on eigenvalue span
-          if (evSpan) {
-            evSpan.textContent = evSpan.textContent; // noop to keep content same; observer still fires due to childList not changing in some browsers
-            // As fallback, run the projection update directly
-            const lam = parseFloat(evSpan.textContent || '');
-            if (!isFinite(lam) || lam <= 0) return;
-            const g = Math.pow(lam, 1/5);
-            const P0 = parseFloat(p0Input.value || '');
-            if (!isFinite(P0) || P0 < 0) { proj.classList.add('hidden'); return; }
-            projBody.innerHTML = '';
-            years.forEach((year, idx) => {
-              const t = idx;
-              const pt = P0 * Math.pow(g, t);
-              const tr = document.createElement('tr');
-              const tdYear = document.createElement('td'); tdYear.textContent = String(year); tdYear.style.textAlign = 'left';
-              const tdVal = document.createElement('td'); tdVal.textContent = Number(pt).toLocaleString(undefined, { maximumFractionDigits: 6 });
-              tr.appendChild(tdYear); tr.appendChild(tdVal);
-              projBody.appendChild(tr);
-            });
-            proj.classList.remove('hidden');
-          }
-        });
-      }
-    })();
+    const SIZE = 21;
+    const grid = document.getElementById('matrixGrid');
+    function buildGrid(){grid.innerHTML='';for(let r=0;r<SIZE;r++){for(let c=0;c<SIZE;c++){const input=document.createElement('input');input.type='number';input.step='any';input.className='matrix-cell';input.placeholder=r===0?('f'+(c+1)):(c===r-1?('s'+r):'0');input.value='';input.dataset.row=r;input.dataset.col=c;grid.appendChild(input);}}}
+    buildGrid();
+    document.getElementById('csvFile').addEventListener('change',(e)=>{const file=e.target.files[0];if(!file)return;const reader=new FileReader();reader.onload=()=>{const rows=reader.result.split(/\r?\n/).filter(Boolean);const data=rows.map(r=>r.split(',').map(v=>v.trim()));for(let r=0;r<Math.min(SIZE,data.length);r++){for(let c=0;c<Math.min(SIZE,data[r].length);c++){const idx=r*SIZE+c;const cell=grid.children[idx];if(cell)cell.value=data[r][c];}}};reader.readAsText(file);});
+    function readMatrix(){const A=Array.from({length:SIZE},()=>Array(SIZE).fill(0));for(let r=0;r<SIZE;r++){for(let c=0;c<SIZE;c++){const idx=r*SIZE+c;const val=parseFloat(grid.children[idx].value||'0');A[r][c]=isFinite(val)?val:0;}}return A;}
+    function powerIteration(A,maxIter=1000,tol=1e-10){const n=A.length;let v=Array(n).fill(0);v[0]=1;let lambda=0;for(let k=1;k<=maxIter;k++){const w=Array(n).fill(0);for(let i=0;i<n;i++){let sum=0;for(let j=0;j<n;j++)sum+=A[i][j]*v[j];w[i]=sum;}const absw=w.map(Math.abs);const m=Math.max(...absw);if(m===0)break;const vNext=w.map(x=>x/m);const diff=vNext.map((x,i)=>Math.abs(x-v[i]));const err=Math.max(...diff);v=vNext;lambda=m;if(err<tol)return{lambda,v,iterations:k}}return{lambda,v,iterations:1000}}
+    function formatVector(v){return v.map((x,i)=>`v${i+1}: ${Number(x).toLocaleString(undefined,{maximumFractionDigits:6})}`).join('\n')}
+    function calculateEigenvalue(){const A=readMatrix();const {lambda,v,iterations}=powerIteration(A);document.getElementById('results').classList.remove('hidden');document.getElementById('eigenvalue').textContent=Number(lambda).toLocaleString(undefined,{maximumFractionDigits:10});document.getElementById('iterations').textContent=iterations;document.getElementById('eigenvector').textContent=formatVector(v);updateProjection();}
+    const years=[2025,2030,2035,2040,2045,2050];
+    function updateProjection(){const evSpan=document.getElementById('eigenvalue');const proj=document.getElementById('projection');const projBody=document.getElementById('projectionBody');const p0Input=document.getElementById('p0');const lam=parseFloat((evSpan.textContent||'').replace(/,/g,''));const P0=parseFloat(p0Input.value||'');if(!isFinite(lam)||lam<=0||!isFinite(P0)||P0<0){proj.classList.add('hidden');projBody.innerHTML='';return;}const g=Math.pow(lam,1/5);projBody.innerHTML='';years.forEach((year,idx)=>{const t=idx;const pt=P0*Math.pow(g,t);const tr=document.createElement('tr');const tdYear=document.createElement('td');tdYear.textContent=String(year);tdYear.style.textAlign='left';const tdVal=document.createElement('td');tdVal.textContent=Number(pt).toLocaleString(undefined,{maximumFractionDigits:6});tr.appendChild(tdYear);tr.appendChild(tdVal);projBody.appendChild(tr);});proj.classList.remove('hidden');}
+    document.getElementById('p0').addEventListener('input',updateProjection);
   </script>
-  <!-- existing content below remains unchanged --><!-- The rest of the calculator HTML/JS must not be altered; preserving functionality -->
+</body>
+</html>

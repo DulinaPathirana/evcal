@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Leslie Matrix Calculator</title>
+    <title>Leslie Matrix Calculator (21x21)</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
             padding: 20px;
             background-color: #f5f5f5;
@@ -30,8 +30,7 @@
             margin: 10px 0 5px;
             font-weight: bold;
         }
-        input[type="number"], input[type="file"] {
-            width: 100%;
+        input[type="number"], input[type="text"], input[type="file"] {
             padding: 8px;
             margin: 5px 0;
             border: 1px solid #ddd;
@@ -55,22 +54,14 @@
             margin: 20px 0;
             overflow-x: auto;
         }
-        table {
-            border-collapse: collapse;
+        .fertility-row, .survival-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
             margin: 10px 0;
         }
-        td, th {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: center;
-            min-width: 60px;
-        }
-        th {
-            background-color: #4CAF50;
-            color: white;
-        }
-        input[type="number"].matrix-input {
-            width: 80px;
+        .fertility-row input, .survival-row input {
+            width: 60px;
             padding: 5px;
             text-align: center;
         }
@@ -89,85 +80,104 @@
             font-size: 14px;
             margin: 10px 0;
         }
+        .section-label {
+            font-weight: bold;
+            margin-top: 15px;
+            color: #4CAF50;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Leslie Matrix Calculator</h1>
+        <h1>Leslie Matrix Calculator (21x21)</h1>
         
-        <div class="input-section">
-            <label for="matrixSize">Matrix Size (n x n):</label>
-            <input type="number" id="matrixSize" min="2" max="10" value="3">
-            <button onclick="generateMatrix()">Generate Matrix</button>
-        </div>
-
         <div class="input-section">
             <label for="csvFile">Import from CSV:</label>
             <input type="file" id="csvFile" accept=".csv">
             <button onclick="importCSV()">Import CSV</button>
-            <div class="info">CSV format: Each row should contain values separated by commas</div>
+            <div class="info">CSV format: First row = 21 fertility rates, Second row = 20 survival rates (comma-separated)</div>
         </div>
 
         <div class="matrix-container">
-            <h3>Leslie Matrix:</h3>
-            <div id="matrixTable"></div>
+            <div class="section-label">Fertility Rates (Top Row - 21 values):</div>
+            <div class="fertility-row" id="fertilityInputs"></div>
+            
+            <div class="section-label">Survival Rates (Subdiagonal - 20 values):</div>
+            <div class="survival-row" id="survivalInputs"></div>
         </div>
 
         <div class="input-section">
-            <label for="initialPop">Initial Population Vector (comma-separated):</label>
-            <input type="text" id="initialPop" placeholder="e.g., 100, 50, 25">
+            <label for="initialPop">Initial Population Vector (comma-separated, 21 values):</label>
+            <input id="initialPop" type="text" placeholder="e.g., 100, 50, 25, ..." style="width: 100%;">
         </div>
 
         <div class="input-section">
             <label for="timeSteps">Number of Time Steps:</label>
-            <input type="number" id="timeSteps" min="1" max="100" value="10">
+            <input id="timeSteps" type="number" value="10" min="1" max="100">
         </div>
 
         <button onclick="calculate()">Calculate Population Dynamics</button>
         <button onclick="calculateEigenvalues()">Calculate Eigenvalues</button>
-
-        <div id="error" class="error"></div>
-        <div id="results" class="results"></div>
+        
+        <div class="error" id="error"></div>
+        <div class="results" id="results"></div>
     </div>
 
     <script>
-        let matrixSize = 3;
-        let leslieMatrix = [];
+        const matrixSize = 21;
+        let fertilityRates = Array(21).fill(0);
+        let survivalRates = Array(20).fill(0);
 
-        function generateMatrix() {
-            matrixSize = parseInt(document.getElementById('matrixSize').value);
-            if (matrixSize < 2 || matrixSize > 10) {
-                showError('Matrix size must be between 2 and 10');
-                return;
+        function initializeInputs() {
+            // Create fertility rate inputs
+            const fertilityDiv = document.getElementById('fertilityInputs');
+            for (let i = 0; i < 21; i++) {
+                const input = document.createElement('input');
+                input.type = 'number';
+                input.step = '0.01';
+                input.value = '0';
+                input.id = `fertility_${i}`;
+                input.onchange = function() { updateFertility(i, this.value); };
+                fertilityDiv.appendChild(input);
             }
-            
-            leslieMatrix = Array(matrixSize).fill(0).map(() => Array(matrixSize).fill(0));
-            displayMatrix();
-            clearError();
+
+            // Create survival rate inputs
+            const survivalDiv = document.getElementById('survivalInputs');
+            for (let i = 0; i < 20; i++) {
+                const input = document.createElement('input');
+                input.type = 'number';
+                input.step = '0.01';
+                input.value = '0';
+                input.min = '0';
+                input.max = '1';
+                input.id = `survival_${i}`;
+                input.onchange = function() { updateSurvival(i, this.value); };
+                survivalDiv.appendChild(input);
+            }
         }
 
-        function displayMatrix() {
-            let table = '<table><thead><tr>';
-            for (let i = 0; i < matrixSize; i++) {
-                table += `<th>Col ${i + 1}</th>`;
-            }
-            table += '</tr></thead><tbody>';
-            
-            for (let i = 0; i < matrixSize; i++) {
-                table += '<tr>';
-                for (let j = 0; j < matrixSize; j++) {
-                    const value = leslieMatrix[i][j] || 0;
-                    table += `<td><input type="number" class="matrix-input" step="0.01" value="${value}" 
-                              onchange="updateMatrix(${i}, ${j}, this.value)"></td>`;
-                }
-                table += '</tr>';
-            }
-            table += '</tbody></table>';
-            document.getElementById('matrixTable').innerHTML = table;
+        function updateFertility(index, value) {
+            fertilityRates[index] = parseFloat(value) || 0;
         }
 
-        function updateMatrix(i, j, value) {
-            leslieMatrix[i][j] = parseFloat(value) || 0;
+        function updateSurvival(index, value) {
+            survivalRates[index] = parseFloat(value) || 0;
+        }
+
+        function getLeslieMatrix() {
+            const matrix = Array(21).fill(0).map(() => Array(21).fill(0));
+            
+            // Fill first row with fertility rates
+            for (let j = 0; j < 21; j++) {
+                matrix[0][j] = fertilityRates[j];
+            }
+            
+            // Fill subdiagonal with survival rates
+            for (let i = 0; i < 20; i++) {
+                matrix[i + 1][i] = survivalRates[i];
+            }
+            
+            return matrix;
         }
 
         function importCSV() {
@@ -184,20 +194,40 @@
                 try {
                     const text = e.target.result;
                     const rows = text.trim().split('\n');
-                    const matrix = rows.map(row => 
-                        row.split(',').map(val => parseFloat(val.trim()))
-                    );
-
-                    if (matrix.length !== matrix[0].length) {
-                        showError('CSV must contain a square matrix');
+                    
+                    if (rows.length < 2) {
+                        showError('CSV must contain at least 2 rows: fertility rates and survival rates');
                         return;
                     }
 
-                    matrixSize = matrix.length;
-                    document.getElementById('matrixSize').value = matrixSize;
-                    leslieMatrix = matrix;
-                    displayMatrix();
+                    // Parse fertility rates (first row)
+                    const fertilityValues = rows[0].split(',').map(val => parseFloat(val.trim()));
+                    if (fertilityValues.length !== 21) {
+                        showError('First row must contain exactly 21 fertility rates');
+                        return;
+                    }
+
+                    // Parse survival rates (second row)
+                    const survivalValues = rows[1].split(',').map(val => parseFloat(val.trim()));
+                    if (survivalValues.length !== 20) {
+                        showError('Second row must contain exactly 20 survival rates');
+                        return;
+                    }
+
+                    // Update arrays and inputs
+                    fertilityRates = fertilityValues;
+                    survivalRates = survivalValues;
+
+                    // Update input fields
+                    for (let i = 0; i < 21; i++) {
+                        document.getElementById(`fertility_${i}`).value = fertilityRates[i];
+                    }
+                    for (let i = 0; i < 20; i++) {
+                        document.getElementById(`survival_${i}`).value = survivalRates[i];
+                    }
+
                     clearError();
+                    showInfo('CSV imported successfully!');
                 } catch (error) {
                     showError('Error parsing CSV file: ' + error.message);
                 }
@@ -218,8 +248,8 @@
 
             const initialPop = initialPopStr.split(',').map(val => parseFloat(val.trim()));
             
-            if (initialPop.length !== matrixSize) {
-                showError(`Initial population vector must have ${matrixSize} elements`);
+            if (initialPop.length !== 21) {
+                showError('Initial population vector must have exactly 21 elements');
                 return;
             }
 
@@ -228,15 +258,15 @@
                 return;
             }
 
+            const leslieMatrix = getLeslieMatrix();
             let results = '<h3>Population Dynamics:</h3>';
             let currentPop = [...initialPop];
             
-            results += `<p><strong>Time 0:</strong> [${currentPop.map(v => v.toFixed(2)).join(', ')}]</p>`;
+            results += `<p><strong>Time 0:</strong> [${currentPop.map(v => v.toFixed(2)).join(', ')}] (Total: ${currentPop.reduce((a, b) => a + b, 0).toFixed(2)})</p>`;
             
             for (let t = 1; t <= timeSteps; t++) {
                 currentPop = multiplyMatrixVector(leslieMatrix, currentPop);
-                results += `<p><strong>Time ${t}:</strong> [${currentPop.map(v => v.toFixed(2)).join(', ')}] 
-                            (Total: ${currentPop.reduce((a, b) => a + b, 0).toFixed(2)})</p>`;
+                results += `<p><strong>Time ${t}:</strong> [${currentPop.map(v => v.toFixed(2)).join(', ')}] (Total: ${currentPop.reduce((a, b) => a + b, 0).toFixed(2)})</p>`;
             }
 
             document.getElementById('results').innerHTML = results;
@@ -257,12 +287,8 @@
         function calculateEigenvalues() {
             clearError();
             
-            if (matrixSize > 4) {
-                showError('Eigenvalue calculation is only supported for matrices up to 4x4 due to computational complexity');
-                return;
-            }
-
             try {
+                const leslieMatrix = getLeslieMatrix();
                 const eigenvalues = powerMethod(leslieMatrix);
                 let results = '<h3>Eigenvalue Analysis:</h3>';
                 results += `<p><strong>Dominant Eigenvalue (λ₁):</strong> ${eigenvalues.value.toFixed(4)}</p>`;
@@ -303,15 +329,20 @@
 
         function showError(message) {
             document.getElementById('error').textContent = message;
+            document.getElementById('results').innerHTML = '';
         }
 
         function clearError() {
             document.getElementById('error').textContent = '';
         }
 
-        // Initialize matrix on page load
+        function showInfo(message) {
+            document.getElementById('results').innerHTML = `<p class="info">${message}</p>`;
+        }
+
+        // Initialize inputs on page load
         window.onload = function() {
-            generateMatrix();
+            initializeInputs();
         };
     </script>
 </body>
